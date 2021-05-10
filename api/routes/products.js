@@ -1,6 +1,8 @@
 const express = require('express');
-
 const router = express.Router();
+const Product = require('../models/product');
+const mongoose = require('mongoose');
+
 
 router.get('/' , (req , res , next) =>{
 
@@ -23,8 +25,29 @@ router.get('/' , (req , res , next) =>{
 
 });
 
-router.post('/product' , () =>{
-
+router.post('/product' , (req , res , next) =>{
+    const product = new Product({
+        _id: mongoose.Types.ObjectId(),
+        name: req.body.name,
+        price: req.body.price
+    });
+    product.save().then(result =>{
+        console.log(`The result is ${result}`);
+    }).catch(error => {console.log(error)}); // store in the data base
+    res.status(201).json({
+        message: "Product created successfully!",
+        product: product
+    });
+    
 });
+
+router.get('/:id' , (req, res , next)=>{
+    const id = req.params.id;
+    Product.findById(id).exec().then(doc => {
+        res.status(200).json(doc)
+    }).catch(error => console.log(error));
+});
+
+
 
 module.exports = router;
